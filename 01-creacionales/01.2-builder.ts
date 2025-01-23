@@ -50,24 +50,34 @@ class QueryBuilder {
   }
 
   select(...fields: string[]): QueryBuilder {
-    throw new Error('Method not implemented.');
+    this.fields = fields;
+    return this;
   }
 
   where(condition: string): QueryBuilder {
-    throw new Error('Method not implemented.');
+    this.conditions.push(condition); 
+    return this;
   }
 
   orderBy(field: string, direction: 'ASC' | 'DESC' = 'ASC'): QueryBuilder {
-    throw new Error('Method not implemented.');
+    this.orderFields.push(`${field} ${direction}`);
+    return this;
   }
 
   limit(count: number): QueryBuilder {
-    throw new Error('Method not implemented.');
+    this.limitCount = count;
+    return this;
   }
 
   execute(): string {
     // Select id, name, email from users where age > 18 and country = 'Cri' order by name ASC limit 10;
-    throw new Error('Method not implemented.');
+    const query = `SELECT`;
+    const fields: string = this.fields.length > 0 ? this.fields.join(', ') : '*';
+    const conditions = this.conditions.length > 0 ? `WHERE ${this.conditions.join(' and ')}`: '';
+    const orderBy = this.orderFields.length > 0 ? `ORDER BY ${this.orderFields.join(' ')}` : '';
+    const limit = this.limitCount ? `limit ${this.limitCount}` : '';
+
+    return `${query} ${fields} FROM ${this.table} ${conditions} ${orderBy} ${limit}`;
   }
 }
 
@@ -80,8 +90,18 @@ function main() {
     .limit(10)
     .execute();
 
+  const gamesQuery = new QueryBuilder('games')
+    .select('id', 'name', 'price')
+    .where('price > 100')
+    .orderBy('price', 'DESC')
+    .limit(5)
+    .execute();
+
   console.log('%cConsulta:\n', COLORS.red);
   console.log(usersQuery);
+
+  console.log('%cConsulta:\n', COLORS.yellow);
+  console.log(gamesQuery);
 }
 
 main();
